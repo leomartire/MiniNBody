@@ -1,3 +1,6 @@
+# Exclude handmade Python scripts (which are only here to help the user generate initial conditions files).
+./Python/*.py
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
