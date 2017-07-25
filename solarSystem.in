@@ -1,0 +1,113 @@
+# Constants and units used here :
+# - G  = 6.674080000000e-11 [L^{3}][M^{-1}][T^{-2}],
+# - [L]= 1.000000000000e+00 m,
+# - [M]= 1.000000000000e+00 kg,
+# - [T]= 1.000000000000e+00 s,
+# - [V]= 1.000000000000e+00 m.s^{-1},
+
+# Describes the gravitationnal constant to use in the simulation. This fully characterise the units used in the simulation.
+# 6.67408e-11 is to use when using SI units ([L] in meters, [M] in kilograms and [T] in seconds).
+# 4.302e-3  is to use when using astrophysical units ([L] in parsecs, [M] in solar masses and [T] in megayears).
+# Example :
+# gravitational_constant 4.302e-3
+gravitational_constant  6.67408e-11
+
+# Describes the softening to use in the simulation (not to consider particles too close to each other, in [L]).
+# One can use 0 to disable softening use.
+# Example :
+# softening 1e-6
+softening 1e3
+
+# Describes the number of bodies in the simulation.
+# Example :
+# nbody 10
+nbody 10
+
+# Describes the duration of the simulation (in [T]).
+# Example :
+# duration 20
+duration 126230400
+
+# Describes the integration time step (in [T]).
+# Example :
+# timestep  1.0e-3
+timestep 31.5576
+
+# Decribes the interval between printing positions of each body in the output file (in [T]).
+# Example :
+# print_interval 1
+print_interval 631152
+
+# Should the simulator determine the center-of-mass velocity of the system from initial conditions and modify all velocities so that the overall system center-of-mass velocity is zero ?
+# Should be either 'yes' or 'no'.
+# Example :
+# recenter yes
+recenter no
+
+# Should the simulator use a galactic model ? The galaxy is supposed to be centered on the origin of the reference (O=[0.0, 0.0, 0.0]) and its model is given by a spherical Plummer bulge, a Miyamoto-Nagai disk and a dark matter halo.
+# Should be either 'yes' or 'no'.
+# Should be followed by galactic parameters.
+# Example :
+# galactic yes
+galactic no
+
+# Galactic parameters (only used if "galactic" is set to "yes" just before). Note that units should be respected here.
+# Format :
+# galParam mb ab md ad hd vh ah
+# Where :
+# - mb is the bulge total mass (in [M]),
+# - ab is a bulge parameter (in [L]),
+# - md is the disk total mass (in [M]),
+# - ad is a disk parameter (in [L]),
+# - hd is a disk shape parameter (in [L]),
+# - vh is a halo parameter (in [L][T^{-1}]),
+# - ah is a halo parameter (in [L]).
+# Example (for a classical model, using astrophysical units) :
+# galParam 9.9e9 0.25e3 72e9 3.5e3 0.4e3 2.2e5 20e3
+
+# Describes the integration technique to use. The first three should not be used, as they have not been fully tested, but they are not very efficient anyways. Please prefer the three following ones.
+# - "E1"  is Euler's method (first order) for both velocity and acceleration,
+# - "E1a" is Euler's method (first order) but where the new velocity is used to advance old position,
+# - "E2"  is Euler's method (second order) also known as Heun's method.
+# - "RK4" is fourth-order Runge-Kutta's method (order 4, better stability, longer execution (4 evaluations)).
+# - "PECE" is a PECE schema with Adams-Bashforth(3+1) prediction, Adams-Moulton(3+1) correction and RK4 initialisations (order 5, slightly worse stability, moderate execution time (2 evaluations)).
+# - "PEC" is a PEC schema (PECE without last evaluation) with Adams-Bashforth(3+1) prediction, Adams-Moulton(3+1) correction and RK4 initialisations (order 5, slightly worse stability, faster execution (1 evaluation)).
+# Example :
+# technique RK4
+technique PECE
+
+# Describes the name of file into which to write output.
+# One can use "-" to write to stdout.
+# Example :
+# outfile -
+outfile ./solarSystem.out
+
+# Description of bodies : one line per body. Note that units should be respected here.
+# Format :
+# body index name mass px py pz vx vy vz 
+# Where :
+# - body     is the string "body",
+# - index    is an index, starting at 0, and unique,
+# - name     is the name of the object, unique,
+# - mass     is mass (in [M]),
+# - px py pz are starting positions (in [L]),
+# - vx vy vz are starting velocities (in [V]).
+# Example :
+# body 0 sun 1.9885e+30 0.0 0.0 0.0 0.0 0.0 0.0
+body 0 sun      1.9885e+30          0.0                 0.0                 0.0                 0.0                 0.0                 0.0
+body 1 mercury  3.301999999999e+23 -5.618253699990e+10 -3.082521545833e+10  2.636406924672e+09  1.340102416873e+04 -4.057576840572e+04 -4.544866325642e+03
+body 2 venus    4.868500000001e+24  1.082732094391e+11  6.690567532977e+09 -6.157137407695e+09 -2.302215541284e+03  3.479530909525e+04  6.095922009898e-04
+body 3 earth    5.972190000001e+24 -2.630368681613e+10  1.447316725440e+11 -4.542557890691e+06 -2.979125633230e+04 -5.448753300128e+03  7.167537272348e-07
+body 4 mars     6.418500000000e+23 -1.786308254181e+11  1.714210677218e+11  7.977909589737e+09 -1.586089524115e+04 -1.541767230409e+04  6.640099036937e-05
+body 5 jupiter  1.898130000000e+27  5.614922357098e+11  4.877742987389e+11 -1.459068222512e+10 -8.734843948325e+03  1.049533516788e+04  1.518919307337e-04
+body 6 saturn   5.683190000001e+26 -1.337307007599e+12 -5.568020510337e+11  6.292451958423e+10  3.185420588201e+03 -8.930780638937e+03  2.845304545894e-05
+body 7 uranus   8.681030000000e+25  2.997674694758e+12  1.807704994274e+11 -3.815961607612e+10 -4.669074762526e-04  6.488267314999e+03  3.035844371959e-05
+body 8 neptune  1.024100000000e+26  3.892279458592e+12 -2.234510297379e+12 -4.367059394267e+10  2.663322383994e+03  4.753166300262e+03 -1.598242124694e-04
+body 9 pluto    1.307000000000e+22  5.914347005253e+11 -4.761723523761e+12  3.386169251759e+11  5.483495730494e+03 -4.121213370272e-04 -1.563849632196e+03
+
+# Note :
+# The positions of the solar system bodies are those on the 01/01/2012 at 12:00:00, according to JPL Horizons.
+# From 01/01/2012 at 12:00:00 to 01/01/2016 at 12:00:00, there is 4 full years = 1461 days = 4e-06 Myr = 126230400 seconds, hence the duration of the simulation.
+# Timestep : 1e-12 Myr = 31.5576 seconds.
+# Print interval : 2e-8 Myr = 7.305 days = 631152 seconds (to have 200 snapshots).
+# The variable JPLX in JPLData.py contains the positions and velocities in astrophysical units of the solar system bodies on the 01/01/2016 at 12:00:00, according to JPL Horizons.
