@@ -1,6 +1,8 @@
 # MiniNBody
 A simple N-Body simulator, able to support a galactic environnement (under the form of a gravitational field).
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1420237.svg)](https://doi.org/10.5281/zenodo.1420237)
+
 ## Description
 This is a simple N-Body simulator, based on simpler one by Michael Richmond in 2009.
 
