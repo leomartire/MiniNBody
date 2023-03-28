@@ -22,18 +22,22 @@
 -------------------------------------------------------------*/
 
 /* Includes. ------------------------------------------------*/
-#
-include < math.h > #include < omp.h > #include < stdio.h > #include < stdlib.h > #include < string.h > #include < time.h >
-  /*-----------------------------------------------------------*/
+#include <math.h>
+#include <omp.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+/*-----------------------------------------------------------*/
 
-  /* Defines. -------------------------------------------------*/
-  #undef DEBUG# define COMMENT_CHAR '#' // any line starting with this in input file is ignored
-  #
-define LINELEN 1024 // max length of lines in input file
-# define MAX_NBODY 9000 // maximum number of bodies we can handle (change this according to the type of simulation : no need to allocate 9000 spaces to simulate 10 particles)
-# define MAX_TECHNIQUE 10 // maximum number of intergration techniques we can handle
-# define NAMELEN 30 // max length of names of objects
-# define NBUF 1024
+/* Defines. -------------------------------------------------*/
+#undef DEBUG
+#define COMMENT_CHAR '#' // any line starting with this in input file is ignored
+#define LINELEN 1024 // max length of lines in input file
+#define MAX_NBODY 9000 // maximum number of bodies we can handle (change this according to the type of simulation : no need to allocate 9000 spaces to simulate 10 particles)
+#define MAX_TECHNIQUE 10 // maximum number of intergration techniques we can handle
+#define NAMELEN 30 // max length of names of objects
+#define NBUF 1024
 /*-----------------------------------------------------------*/
 
 /* Type definitions. ----------------------------------------*/
@@ -69,25 +73,23 @@ TECHNIQUE;
  *     g_body_array[i].pos[0]-g_body_array[j].pos[0]
  * etc.
  */
-#
-define SET_POS_DIFF(vec, i, j)\
+#define SET_POS_DIFF(vec, i, j)\
 vec.val[0] = g_body_array[i].pos[0] - g_body_array[j].pos[0];\
 vec.val[1] = g_body_array[i].pos[1] - g_body_array[j].pos[1];\
 vec.val[2] = g_body_array[i].pos[2] - g_body_array[j].pos[2];
 
 /* the magnitude of a VECTOR */
-#
-define VECTOR_MAG(vec)\
+#define VECTOR_MAG(vec)\
   (sqrt(vec.val[0] * vec.val[0] + vec.val[1] * vec.val[1] + \
     vec.val[2] * vec.val[2]))
 
 /* the square of the magnitude of a VECTOR */
-# define VECTOR_MAG_SQUARED(vec)\
+#define VECTOR_MAG_SQUARED(vec)\
   (vec.val[0] * vec.val[0] + vec.val[1] * vec.val[1] + \
     vec.val[2] * vec.val[2])
 
 /* the SQUARE of distance between two bodies */
-# define DIST_SQUARED(i, j)\
+#define DIST_SQUARED(i, j)\
   (((g_body_array[i].pos[0] - g_body_array[j].pos[0]) * \
       (g_body_array[i].pos[0] - g_body_array[j].pos[0])) + \
     ((g_body_array[i].pos[1] - g_body_array[j].pos[1]) * \
@@ -96,32 +98,26 @@ define VECTOR_MAG(vec)\
       (g_body_array[i].pos[2] - g_body_array[j].pos[2])))
 
 /* the difference of two vectors */
-# define VECTOR_SUBTRACT(a, b, difference)\
+#define VECTOR_SUBTRACT(a, b, difference)\
 difference.val[0] = a.val[0] - b.val[0];\
 difference.val[1] = a.val[1] - b.val[1];\
 difference.val[2] = a.val[2] - b.val[2];
 
 /* the cross product of two vectors */
-#
-define VECTOR_CROSS(a, b, product)\
+#define VECTOR_CROSS(a, b, product)\
 product.val[0] = a.val[1] * b.val[2] - a.val[2] * b.val[1];\
 product.val[1] = a.val[2] * b.val[0] - a.val[0] * b.val[2];\
 product.val[2] = a.val[0] * b.val[1] - a.val[1] * b.val[0];
 
-#
-define max(a, b)\
-  ({
-    __typeof__(a) _a = (a);\
-    __typeof__(b) _b = (b);\
-    _a > _b ? _a : _b;
-  })
+#define max(a,b) \
+   ({ __typeof__ (a) _a=(a); \
+       __typeof__ (b) _b=(b); \
+     _a>_b ? _a : _b; })
 
-# define min(a, b)\
-  ({
-    __typeof__(a) _a = (a);\
-    __typeof__(b) _b = (b);\
-    _a < _b ? _a : _b;
-  })
+#define min(a,b) \
+   ({ __typeof__ (a) _a=(a); \
+       __typeof__ (b) _b=(b); \
+     _a<_b ? _a : _b; })
   /*-----------------------------------------------------------*/
 
 /* Global variables. ----------------------------------------*/
@@ -317,8 +313,7 @@ int main(int argc, char * argv[]) {
   printf("> Available threads : %d.\n", omp_get_max_threads());
   omp_set_num_threads(min(max((int)(floor(g_body_number / g_nbStarsPerThread)), 1), omp_get_max_threads()));
   //omp_set_num_threads(3);
-  #
-  pragma omp parallel
+  #pragma omp parallel
   printf("> Launching simulation with %d thread(s) (i.e., roughly, %d star(s) per thread).\n", omp_get_num_threads(), (int)(g_body_number / omp_get_num_threads()));
 
   printing_clock = 0.0; // initialise printing clock
@@ -518,9 +513,8 @@ static int stateToDerivativeState(BODY * b, DBODY * db) {
   VECTOR dist, dist_frac, tmpGravitationalForce;
   double dist_tot;
   double dist_squared;
-  double top, bottom, force_mag;#
-  pragma omp
-  for
+  double top, bottom, force_mag;
+  #pragma omp for
   for (i = 0; i < g_body_number; i++) { // on body i, ...
     for (c = 0; c < 3; c++) { // initialise force at 0, ...
       tmpForcesForDerivation[i].val[c] = 0.0;
@@ -582,9 +576,8 @@ static int AdamsBashforth(BODY * outState, double step, BODY * state0, DBODY * d
   // @param *dStateB1 the system state's derivative 1 iteration before (DBODY array)
   // @param *dStateB2 the system state's derivative 2 iterations before (DBODY array)
   // @param *dStateB3 the system state's derivative 3 iterations before (DBODY array)
-  int i, c;#
-  pragma omp
-  for
+  int i, c;
+  #pragma omp for
   for (i = 0; i < g_body_number; i++) {
     for (c = 0; c < 3; c++) {
       outState[i].pos[c] = state0[i].pos[c] + step * (g_AB_b03 * dStateB0[i].dp[c] + g_AB_b13 * dStateB1[i].dp[c] + g_AB_b23 * dStateB2[i].dp[c] + g_AB_b33 * dStateB3[i].dp[c]); // p=f(y)
@@ -605,9 +598,8 @@ static int AdamsMoulton(BODY * outState, double step, BODY * state0, DBODY * pre
   // @param *dStateB1 the system state's derivative 1 iteration before (DBODY array)
   // @param *dStateB2 the system state's derivative 2 iterations before (DBODY array)
   // @param *dStateB3 the system state's derivative 3 iterations before (DBODY array)
-  int i, c;#
-  pragma omp
-  for
+  int i, c;
+  #pragma omp for
   for (i = 0; i < g_body_number; i++) {
     for (c = 0; c < 3; c++) {
       outState[i].pos[c] = state0[i].pos[c] + step * (g_AM_bp3 * predictedDState[i].dp[c] + g_AM_b03 * dStateB0[i].dp[c] + g_AM_b13 * dStateB1[i].dp[c] + g_AM_b23 * dStateB2[i].dp[c] + g_AM_b33 * dStateB3[i].dp[c]);
@@ -627,9 +619,8 @@ static int shiftTemporaryStates(DBODY * dStateB3, DBODY * dStateB2, DBODY * dSta
   // @param *newDState the system state's derivative 1 iteration after (DBODY array)
   // @param *state0 (output) the system state at current iteration (BODY array)
   // @param *newState the system state 1 iteration after (BODY array)
-  int i, c;#
-  pragma omp
-  for
+  int i, c;
+  #pragma omp for
   for (i = 0; i < g_body_number; i++) {
     for (c = 0; c < 3; c++) {
       dStateB3[i].dp[c] = dStateB2[i].dp[c];
@@ -678,9 +669,8 @@ static int tech_rk4(double suggested_timestep, double * actual_timestep) {
   if (calc_grav_forces(step2_array, a1) != 0) {
     printError("tech_rk4", "Function calc_grav_forces fails in step a1.");
     return (1);
-  }#
-  pragma omp
-  for
+  }
+  #pragma omp for
   for (i = 0; i < g_body_number; i++) {
     for (c = 0; c < 3; c++) {
       a1[i].val[c] /= step2_array[i].mass; // Convert those forces to accelerations.
@@ -693,9 +683,8 @@ static int tech_rk4(double suggested_timestep, double * actual_timestep) {
   if (calc_grav_forces(step2_array, a2) != 0) {
     printError("tech_rk4", "Function calc_grav_forces fails in step a2.");
     return (1);
-  }#
-  pragma omp
-  for
+  }
+  #pragma omp for
   for (i = 0; i < g_body_number; i++) {
     for (c = 0; c < 3; c++) {
       a2[i].val[c] /= step2_array[i].mass; // Convert those forces to accelerations.
@@ -707,9 +696,8 @@ static int tech_rk4(double suggested_timestep, double * actual_timestep) {
   if (calc_grav_forces(step3_array, a3) != 0) {
     printError("tech_rk4", "Function calc_grav_forces fails in step a3.");
     return (1);
-  }#
-  pragma omp
-  for
+  }
+  #pragma omp for
   for (i = 0; i < g_body_number; i++) {
     for (c = 0; c < 3; c++) {
       a3[i].val[c] /= step3_array[i].mass; // Convert those forces to accelerations.
@@ -721,9 +709,8 @@ static int tech_rk4(double suggested_timestep, double * actual_timestep) {
   if (calc_grav_forces(step4_array, a4) != 0) {
     printError("tech_rk4", "Function calc_grav_forces fails in step a4.");
     return (1);
-  }#
-  pragma omp
-  for
+  }
+  #pragma omp for
   for (i = 0; i < g_body_number; i++) {
     for (c = 0; c < 3; c++) {
       a4[i].val[c] /= step4_array[i].mass; // Convert those forces to accelerations.
@@ -759,9 +746,8 @@ static int calc_grav_forces(BODY * body_array, VECTOR * forces) {
   int i, j, c;
 
   // Compute the forces between all objects using the current positions and store this in the pre-allocated global variable g_cur_forces.
-  #
-  pragma omp
-  for
+  
+  #pragma omp for
   for (i = 0; i < g_body_number; i++) {
     for (j = i; j < g_body_number; j++) {
       VECTOR dist, dist_frac;
@@ -808,9 +794,8 @@ static int calc_grav_forces(BODY * body_array, VECTOR * forces) {
 static int computeTotalForceOnBodies(VECTOR * forces) {
   // Convert forces between each pair (stored in g_cur_forces) to a set of forces on each body.
   // @param *forces (output) forces on each body (VECTOR array)
-  int i, j, c;#
-  pragma omp
-  for
+  int i, j, c;
+  #pragma omp for
   for (i = 0; i < g_body_number; i++) {
     for (c = 0; c < 3; c++) {
       forces[i].val[c] = 0.0;
@@ -831,9 +816,8 @@ static int add_galactic_effect(VECTOR * forces) {
   //-a dark matter halo.
   // @param *forces (input/output) forces on each body (VECTOR array)
   int i;
-  VECTOR tmpGravitationalForce;#
-  pragma omp
-  for
+  VECTOR tmpGravitationalForce;
+  #pragma omp for
   for (i = 0; i < g_body_number; i++) {
     getGravitationalForce(g_body_array[i], & tmpGravitationalForce);
     forces[i].val[0] += tmpGravitationalForce.val[0];
@@ -860,21 +844,21 @@ static int getGravitationalForce(BODY body, VECTOR * tmpGravitationalForce) {
   tmpPhiB = g_G * g_mb * pow(tmpRSquared + g_ab * g_ab, -1.5) * tmpX;
   tmpPhiD = g_G * g_md * pow(tmpRCSquared + pow(g_ad + pow(tmpZSquared + g_hd * g_hd, 0.5), 2.0), -1.5) * tmpX;
   tmpPhiH = -(g_vh * g_vh) / (tmpRSquared + g_ah * g_ah) * tmpX;
-  tmpGravitationalForce - > val[0] = tmpPhiB + tmpPhiD + tmpPhiH;
+  tmpGravitationalForce -> val[0] = tmpPhiB + tmpPhiD + tmpPhiH;
   // y
   tmpPhiB *= (tmpY / tmpX);
   tmpPhiD *= (tmpY / tmpX);
   tmpPhiH *= (tmpY / tmpX);
-  tmpGravitationalForce - > val[1] = tmpPhiB + tmpPhiD + tmpPhiH;
+  tmpGravitationalForce -> val[1] = tmpPhiB + tmpPhiD + tmpPhiH;
   // z
   tmpPhiB *= (tmpZ / tmpY);
   tmpPhiD *= (tmpZ / tmpY);
   tmpPhiH *= (tmpZ / tmpY);
   tmpPhiD *= ((g_ad + pow(tmpZSquared + g_hd * g_hd, 0.5)) / (pow(tmpZSquared + g_hd * g_hd, 0.5)));
-  tmpGravitationalForce - > val[2] = tmpPhiB + tmpPhiD + tmpPhiH;
-  tmpGravitationalForce - > val[0] *= -body.mass;
-  tmpGravitationalForce - > val[1] *= -body.mass;
-  tmpGravitationalForce - > val[2] *= -body.mass;
+  tmpGravitationalForce -> val[2] = tmpPhiB + tmpPhiD + tmpPhiH;
+  tmpGravitationalForce -> val[0] *= -body.mass;
+  tmpGravitationalForce -> val[1] *= -body.mass;
+  tmpGravitationalForce -> val[2] *= -body.mass;
   return (0);
 }
 
@@ -884,18 +868,17 @@ static void copy_bodies(int N, BODY * in , BODY * out) {
   // @param in copy from this array
   // @param out (output) copy to this array
   int i, c;
-  BODY * from_body, * to_body;#
-  pragma omp
-  for
+  BODY * from_body, * to_body;
+  #pragma omp for
   for (i = 0; i < N; i++) {
     from_body = & ( in [i]);
     to_body = & (out[i]);
-    to_body - > index = from_body - > index;
-    strcpy(from_body - > name, to_body - > name);
-    to_body - > mass = from_body - > mass;
+    to_body -> index = from_body -> index;
+    strcpy(from_body -> name, to_body -> name);
+    to_body -> mass = from_body -> mass;
     for (c = 0; c < 3; c++) {
-      to_body - > pos[c] = from_body - > pos[c];
-      to_body - > vel[c] = from_body - > vel[c];
+      to_body -> pos[c] = from_body -> pos[c];
+      to_body -> vel[c] = from_body -> vel[c];
     }
   }
 }
@@ -922,9 +905,8 @@ static int recenter_velocities(void) {
   for (c = 0; c < 3; c++) {
     com_velocity.val[c] = momentum.val[c] / total_mass;
   } // Compute the velocity of the center of mass.
-  #
-  pragma omp
-  for
+  
+  #pragma omp for
   for (i = 0; i < g_body_number; i++) {
     for (c = 0; c < 3; c++) {
       g_body_array[i].vel[c] -= com_velocity.val[c];
@@ -1019,7 +1001,7 @@ static int calc_total_angmom(VECTOR * result) {
     }
   }
   for (c = 0; c < 3; c++) {
-    result - > val[c] = total_ang_mom.val[c];
+    result -> val[c] = total_ang_mom.val[c];
   } // Copy the total angular momentum to output argument.
   return (0);
 }
