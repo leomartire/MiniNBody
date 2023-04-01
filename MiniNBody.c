@@ -464,11 +464,13 @@ int main(int argc, char *argv[]) {
     double delta_e, fraction_delta_e;
     double start_angmom_mag, end_angmom_mag, delta_angmom_mag;
     double fraction_delta_angmom_mag;
-
+    
+    printf("\n");
+    
     delta_e = final_tot_e - initial_tot_e;
     fraction_delta_e = delta_e / fabs(initial_tot_e);
     if (g_verbose_flag > 0) {
-      printf("> Delta_E     =%12.5e,\n  relative difference=%12.5e.\n",
+      printf("> Delta_E             =%12.5e,\n  relative difference =%12.5e (the smaller the better, under 1e-02 is good).\n",
         delta_e, fraction_delta_e);
     }
 
@@ -477,7 +479,7 @@ int main(int argc, char *argv[]) {
     delta_angmom_mag = end_angmom_mag - start_angmom_mag;
     fraction_delta_angmom_mag = delta_angmom_mag / fabs(start_angmom_mag);
     if (g_verbose_flag > 0) {
-      printf("> Delta_angmom=%12.5e,\n  relative difference=%12.5e.\n",
+      printf("> Delta_angmom        =%12.5e,\n  relative difference =%12.5e (the smaller the better, under 1e-02 is good).\n",
         delta_angmom_mag, fraction_delta_angmom_mag);
     }
   }
@@ -496,7 +498,10 @@ int main(int argc, char *argv[]) {
       strcpy(timeUnit, "hours");
       mainLoopTimeTaken /= 3600;
     }
-    printf("\n> All done.\n");
+    
+    printf("\n");
+    
+    printf("> All done.\n");
     printf(">  Main loop was              %12d iterations (integrations) long.\n", n);
     printf(">  Main loop took             %12.2f %s to execute.\n", mainLoopTimeTaken, timeUnit);
     printf(">  Energies computations took %12.2f seconds to execute.\n", energyTimeTaken1 + energyTimeTaken2);
