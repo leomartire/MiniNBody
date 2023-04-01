@@ -41,7 +41,7 @@
 /*-----------------------------------------------------------*/
 
 /* Type definitions. ----------------------------------------*/
-typedef int( * PFI)(double, double * ); // pointer to a function returning an integer
+typedef int(*PFI)(double, double *); // pointer to a function returning an integer
 typedef struct s_vector { // vector
   double val[3];
 }
@@ -130,20 +130,20 @@ DBODY fp1[MAX_NBODY]; // PECE : 1 step backwards derivative state
 DBODY fp2[MAX_NBODY]; // PECE : 2 steps backwards derivative state
 DBODY fp3[MAX_NBODY]; // PECE : 3 steps backwards derivative state
 DBODY pfn1[MAX_NBODY]; // PECE : predicted derivative state
-FILE * g_outfile_fp; // FILE pointer for output
+FILE *g_outfile_fp; // FILE pointer for output
 PFI g_integration_func; // PFI pointer for techniques
 TECHNIQUE g_technique_array[MAX_TECHNIQUE]; // allocate space for techniques
 VECTOR g_cur_forces[MAX_NBODY][MAX_NBODY]; // variable made global to make sure enough memory space is allocated and to enable faster access for simulations with high number of bodies.
 VECTOR tmpForcesForDerivation[MAX_NBODY]; // PECE : temporary vector for derivative state calculation
-double g_AB_b03 = 55.0 / 24.0; // PECE : coefficient for Adams-Bashforth scheme with 3+1 steps
-double g_AB_b13 = -59.0 / 24.0; // PECE : coefficient for Adams-Bashforth scheme with 3+1 steps
-double g_AB_b23 = 37.0 / 24.0; // PECE : coefficient for Adams-Bashforth scheme with 3+1 steps
-double g_AB_b33 = -9.0 / 24.0; // PECE : coefficient for Adams-Bashforth scheme with 3+1 steps
-double g_AM_b03 = 646.0 / 720.0; // PECE : coefficient for Adams-Moulton scheme with 3+1 steps
+double g_AB_b03 =   55.0 /  24.0; // PECE : coefficient for Adams-Bashforth scheme with 3+1 steps
+double g_AB_b13 =  -59.0 /  24.0; // PECE : coefficient for Adams-Bashforth scheme with 3+1 steps
+double g_AB_b23 =   37.0 /  24.0; // PECE : coefficient for Adams-Bashforth scheme with 3+1 steps
+double g_AB_b33 =   -9.0 /  24.0; // PECE : coefficient for Adams-Bashforth scheme with 3+1 steps
+double g_AM_b03 =  646.0 / 720.0; // PECE : coefficient for Adams-Moulton scheme with 3+1 steps
 double g_AM_b13 = -264.0 / 720.0; // PECE : coefficient for Adams-Moulton scheme with 3+1 steps
-double g_AM_b23 = 106.0 / 720.0; // PECE : coefficient for Adams-Moulton scheme with 3+1 steps
-double g_AM_b33 = -19.0 / 720.0; // PECE : coefficient for Adams-Moulton scheme with 3+1 steps
-double g_AM_bp3 = 251.0 / 720.0; // PECE : coefficient for Adams-Moulton scheme with 3+1 steps
+double g_AM_b23 =  106.0 / 720.0; // PECE : coefficient for Adams-Moulton scheme with 3+1 steps
+double g_AM_b33 =  -19.0 / 720.0; // PECE : coefficient for Adams-Moulton scheme with 3+1 steps
+double g_AM_bp3 =  251.0 / 720.0; // PECE : coefficient for Adams-Moulton scheme with 3+1 steps
 double g_G = -1; // gravitational constant (in [L^{3}][M^{-1}][T^{-2}], (to be set by reading the input file))
 double g_ab = -1; // galactic parameter (to be set by reading the input file)
 double g_ad = -1; // galactic parameter (to be set by reading the input file)
@@ -170,27 +170,28 @@ int g_verbose_flag = 0; // if set to 1, print messages as we execute (modifiable
 /* Declarations of functions. -------------------------------*/
 static double calc_total_gpe(void);
 static double calc_total_ke(void);
-static int AdamsBashforth(BODY * outState, double step, BODY * state0, DBODY * dStateB0, DBODY * dStateB1, DBODY * dStateB2, DBODY * dStateB3);
-static int AdamsMoulton(BODY * outState, double step, BODY * state0, DBODY * predictedDState, DBODY * dStateB0, DBODY * dStateB1, DBODY * dStateB2, DBODY * dStateB3);
-static int add_galactic_effect(VECTOR * forces);
-static int calc_grav_forces(BODY * body_array, VECTOR * forces);
-static int calc_total_angmom(VECTOR * result);
-static int computeTotalForceOnBodies(VECTOR * forces);
-static int print_positions(FILE * outfile_fp, double currentSimulationTime);
-static int read_input(char * filename);
+static int AdamsBashforth(BODY *outState, double step, BODY *state0, DBODY *dStateB0, DBODY *dStateB1, DBODY *dStateB2, DBODY *dStateB3);
+static int AdamsMoulton(BODY *outState, double step, BODY *state0, DBODY *predictedDState, DBODY *dStateB0, DBODY *dStateB1, DBODY *dStateB2, DBODY *dStateB3);
+static int add_galactic_effect(VECTOR *forces);
+static int calc_grav_forces(BODY *body_array, VECTOR *forces);
+static int calc_total_angmom(VECTOR *result);
+static int computeTotalForceOnBodies(VECTOR *forces);
+static int print_positions(FILE *outfile_fp, double currentSimulationTime);
+static int read_input(char *filename);
 static int recenter_velocities(void);
-static int getGravitationalForce(BODY body, VECTOR * tmpGravitationalForce);
-static int shiftTemporaryStates(DBODY * dStateB3, DBODY * dStateB2, DBODY * dStateB1, DBODY * dStateB0, DBODY * newDState, BODY * state0, BODY * newState);
-static int stateToDerivativeState(BODY * b, DBODY * db);
-static int tech_euler_1(double suggested_timestep, double * actual_timestep);
-static int tech_euler_1a(double suggested_timestep, double * actual_timestep);
-static int tech_euler_2(double suggested_timestep, double * actual_timestep);
-static int tech_rk4(double suggested_timestep, double * actual_timestep);
-static void copy_bodies(int num_bodies, BODY * from_array, BODY * to_array);
-static void printError(char * funcName, char * msg);
+static int getGravitationalForce(BODY body, VECTOR *tmpGravitationalForce);
+static int shiftTemporaryStates(DBODY *dStateB3, DBODY *dStateB2, DBODY *dStateB1, DBODY *dStateB0, DBODY *newDState, BODY *state0, BODY *newState);
+static int stateToDerivativeState(BODY *b, DBODY *db);
+static int tech_euler_1(double suggested_timestep, double *actual_timestep);
+static int tech_euler_1a(double suggested_timestep, double *actual_timestep);
+static int tech_euler_2(double suggested_timestep, double *actual_timestep);
+static int tech_rk4(double suggested_timestep, double *actual_timestep);
+static void copy_bodies(int num_bodies, BODY *from_array, BODY *to_array);
+static void printError(char *funcName, char *msg);
+void kek(double suggested_timestep, double *actual_timestep);
 /*-----------------------------------------------------------*/
 
-int main(int argc, char * argv[]) {
+int main(int argc, char *argv[]) {
   /* Initialize stuff. --------------------------------------*/
   VECTOR initial_ang_mom, final_ang_mom;
   char inputfile_name[NBUF];
@@ -205,7 +206,7 @@ int main(int argc, char * argv[]) {
     strcpy(g_body_array[i].name, "");
     g_body_array[i].mass = -1;
   }
-  g_outfile_fp = (FILE * ) NULL;
+  g_outfile_fp = (FILE *) NULL;
   strcpy(g_technique_array[g_technique_number].name, "E1");
   g_technique_array[g_technique_number++].func = tech_euler_1;
   strcpy(g_technique_array[g_technique_number].name, "E1a");
@@ -244,7 +245,7 @@ int main(int argc, char * argv[]) {
       printf(" set verbose level to ..%d.. \n", g_verbose_flag);
     }
     if (strncmp(argv[i], "verbose=", 8) == 0) {
-      if (sscanf(argv[i] + 8, "%d", & g_verbose_flag) != 1) {
+      if (sscanf(argv[i] + 8, "%d", &g_verbose_flag) != 1) {
         fprintf(stderr, "can't read verbosity level from ..%s.. \n", argv[i] + 8);
         exit(1);
       }
@@ -331,8 +332,9 @@ int main(int argc, char * argv[]) {
       printf(" >> About to enter the integration function (t=%9.4e).\n", currentSimulationTime);
     }
     suggested_step = g_timestep;
+    actual_step = g_timestep; // safety, in case it does not get allocated in the upcoming calls
     if (g_usePECE_flag == 0 && g_usePEC_flag == 0) { // PECE and PEC are desactivated : just use RK4 all the way.
-      retval = ( * (g_integration_func))(suggested_step, & actual_step);
+      retval = (*(g_integration_func))(suggested_step, &actual_step);
       if (retval != 0) {
         printError("main", "Integration function failed.");
         return (1);
@@ -340,7 +342,7 @@ int main(int argc, char * argv[]) {
       g_timestep = actual_step;
     } else { // PECE or PEC is activated.
       if (n <= 3) { // For the first 4 steps of PECE, call RK4.
-        retval = ( * (g_integration_func))(suggested_step, & actual_step);
+        retval = (*(g_integration_func))(suggested_step, &actual_step);
         if (retval != 0) {
           printError("main", "Integration function failed.");
           return (1);
@@ -554,7 +556,7 @@ static int stateToDerivativeState(BODY * b, DBODY * db) {
       }
     }
     if (g_galactic_flag == 1) { // if the effect of a galaxy is wanted, add it to the current force on body i
-      getGravitationalForce(g_body_array[i], & tmpGravitationalForce);
+      getGravitationalForce(g_body_array[i], &tmpGravitationalForce);
       for (c = 0; c < 3; c++) {
         tmpForcesForDerivation[i].val[c] += tmpGravitationalForce.val[c];
       }
@@ -638,7 +640,7 @@ static int shiftTemporaryStates(DBODY * dStateB3, DBODY * dStateB2, DBODY * dSta
   return (0);
 }
 
-static int tech_rk4(double suggested_timestep, double * actual_timestep) {
+static int tech_rk4(double suggested_timestep, double *actual_timestep) {
   // Advance particle system one timestep using Runge-Kutta fourth-order method.
   // @param suggested_timestep suggested timestep
   // @param *actual_timestep actual timestep used (for now, this function does not try to change the timestep)
@@ -656,15 +658,15 @@ static int tech_rk4(double suggested_timestep, double * actual_timestep) {
   BODY step2_array[MAX_NBODY];
   BODY step3_array[MAX_NBODY];
   BODY step4_array[MAX_NBODY];
-
+  
   timestep = suggested_timestep;
   half_step = timestep * 0.5;
   sixth_step = timestep / 6.0;
-
+  
   copy_bodies(g_body_number, g_body_array, step2_array); // For S3.
   copy_bodies(g_body_number, g_body_array, step3_array); // For S6.
   copy_bodies(g_body_number, g_body_array, step4_array); // For S9.
-
+  
   // S1: use current positions to compute accelerations. Call these "a1".
   if (calc_grav_forces(step2_array, a1) != 0) {
     printError("tech_rk4", "Function calc_grav_forces fails in step a1.");
@@ -735,7 +737,7 @@ static int tech_rk4(double suggested_timestep, double * actual_timestep) {
    * - a4     acceleration predicted one FULL step in future.
    * We can now combine these 4 measurements to produce one good value of velocity (or acceleration) one full step into the future.
    */
-  * actual_timestep = timestep;
+  *actual_timestep = timestep;
   return (0);
 }
 
@@ -819,7 +821,7 @@ static int add_galactic_effect(VECTOR * forces) {
   VECTOR tmpGravitationalForce;
   #pragma omp for
   for (i = 0; i < g_body_number; i++) {
-    getGravitationalForce(g_body_array[i], & tmpGravitationalForce);
+    getGravitationalForce(g_body_array[i], &tmpGravitationalForce);
     forces[i].val[0] += tmpGravitationalForce.val[0];
     forces[i].val[1] += tmpGravitationalForce.val[1];
     forces[i].val[2] += tmpGravitationalForce.val[2];
@@ -862,23 +864,23 @@ static int getGravitationalForce(BODY body, VECTOR * tmpGravitationalForce) {
   return (0);
 }
 
-static void copy_bodies(int N, BODY * in , BODY * out) {
+static void copy_bodies(int N, BODY *in, BODY *out) {
   // Copy an array of BODY structures into a second array in such a manner that we can then modify the copies and leave the originals untouched.
   // @param N number of bodies to be copied
   // @param in copy from this array
   // @param out (output) copy to this array
   int i, c;
-  BODY * from_body, * to_body;
+  BODY *from_body, *to_body;
   #pragma omp for
   for (i = 0; i < N; i++) {
-    from_body = & ( in [i]);
-    to_body = & (out[i]);
-    to_body -> index = from_body -> index;
-    strcpy(from_body -> name, to_body -> name);
-    to_body -> mass = from_body -> mass;
+    from_body = &(in [i]);
+    to_body = &(out[i]);
+    to_body->index = from_body->index;
+    strcpy(from_body->name, to_body->name);
+    to_body->mass = from_body->mass;
     for (c = 0; c < 3; c++) {
-      to_body -> pos[c] = from_body -> pos[c];
-      to_body -> vel[c] = from_body -> vel[c];
+      to_body->pos[c] = from_body->pos[c];
+      to_body->vel[c] = from_body->vel[c];
     }
   }
 }
@@ -1080,7 +1082,7 @@ static int read_input(char * filename) {
     */
     nbody = -1;
     if (strncmp(line, "nbody", 5) == 0) {
-      if (sscanf(line + 5, "%d", & nbody) != 1) {
+      if (sscanf(line + 5, "%d", &nbody) != 1) {
         fprintf(stderr, "ERROR [read_input] : Bad \"nbody\" parameter value in line \"%s\".\n", line);
         return (1);
       }
@@ -1102,7 +1104,7 @@ static int read_input(char * filename) {
     */
     double duration;
     if (strncmp(line, "duration", 8) == 0) {
-      if (sscanf(line + 8, "%lf", & duration) != 1) {
+      if (sscanf(line + 8, "%lf", &duration) != 1) {
         fprintf(stderr, "bad duration value in line ..%s.. \n", line);
         return (1);
       }
@@ -1124,7 +1126,7 @@ static int read_input(char * filename) {
     */
     double timestep;
     if (strncmp(line, "timestep", 8) == 0) {
-      if (sscanf(line + 8, "%lf", & timestep) != 1) {
+      if (sscanf(line + 8, "%lf", &timestep) != 1) {
         fprintf(stderr, "bad timestep value in line ..%s.. \n", line);
         return (1);
       }
@@ -1147,7 +1149,7 @@ static int read_input(char * filename) {
     */
     double interval;
     if (strncmp(line, "print_interval", 14) == 0) {
-      if (sscanf(line + 14, "%lf", & interval) != 1) {
+      if (sscanf(line + 14, "%lf", &interval) != 1) {
         fprintf(stderr, "bad print_interval value in line ..%s.. \n", line);
         return (1);
       }
@@ -1291,7 +1293,7 @@ static int read_input(char * filename) {
       if (g_verbose_flag > 1) {
         printf(" >> About to scan for a body's initial info...\n");
       }
-      if (sscanf(line + 4, " %d %s %lf %lf %lf %lf %lf %lf %lf", & this_index, this_name, & this_mass, & this_px, & this_py, & this_pz, & this_vx, & this_vy, & this_vz) != 9) {
+      if (sscanf(line + 4, " %d %s %lf %lf %lf %lf %lf %lf %lf", &this_index, this_name, &this_mass, &this_px, &this_py, &this_pz, &this_vx, &this_vy, &this_vz) != 9) {
         fprintf(stderr, "ERROR [read_input] : Bad body in line ..%s..\n", line);
         return (1);
       }
@@ -1338,7 +1340,7 @@ static int read_input(char * filename) {
     */
     double softening;
     if (strncmp(line, "softening", 9) == 0) {
-      if (sscanf(line + 9, "%lf", & softening) != 1) {
+      if (sscanf(line + 9, "%lf", &softening) != 1) {
         fprintf(stderr, "ERROR [read_input] : Bad softening value in line :\n%s\n", line);
         return (1);
       }
@@ -1359,7 +1361,7 @@ static int read_input(char * filename) {
     */
     double gravC;
     if (strncmp(line, "gravitational_constant", 22) == 0) {
-      if (sscanf(line + 22, "%lf", & gravC) != 1) {
+      if (sscanf(line + 22, "%lf", &gravC) != 1) {
         fprintf(stderr, "ERROR [read_input] : Bad gravitational constant value in line :\n%s\n", line);
         return (1);
       }
@@ -1403,7 +1405,7 @@ static int read_input(char * filename) {
     */
     double mb, ab, md, ad, hd, vh, ah;
     if (strncmp(line, "galParam", 8) == 0) {
-      if (sscanf(line + 8, " %lf %lf %lf %lf %lf %lf %lf", & mb, & ab, & md, & ad, & hd, & vh, & ah) != 7) {
+      if (sscanf(line + 8, " %lf %lf %lf %lf %lf %lf %lf", &mb, &ab, &md, &ad, &hd, &vh, &ah) != 7) {
         fprintf(stderr, "ERROR [read_input] : Bad galaxy parameter line :\n%s\n", line);
         return (1);
       }
