@@ -647,17 +647,17 @@ static int tech_rk4(double suggested_timestep, double *actual_timestep) {
   int i, c;
   double timestep;
   double half_step, sixth_step;
-  VECTOR v1[MAX_NBODY];
-  VECTOR v2[MAX_NBODY];
-  VECTOR v3[MAX_NBODY];
-  VECTOR v4[MAX_NBODY];
-  VECTOR a1[MAX_NBODY];
-  VECTOR a2[MAX_NBODY];
-  VECTOR a3[MAX_NBODY];
-  VECTOR a4[MAX_NBODY];
-  BODY step2_array[MAX_NBODY];
-  BODY step3_array[MAX_NBODY];
-  BODY step4_array[MAX_NBODY];
+  VECTOR v1[g_body_number];
+  VECTOR v2[g_body_number];
+  VECTOR v3[g_body_number];
+  VECTOR v4[g_body_number];
+  VECTOR a1[g_body_number];
+  VECTOR a2[g_body_number];
+  VECTOR a3[g_body_number];
+  VECTOR a4[g_body_number];
+  BODY step2_array[g_body_number];
+  BODY step3_array[g_body_number];
+  BODY step4_array[g_body_number];
   
   timestep = suggested_timestep;
   half_step = timestep * 0.5;
@@ -1514,8 +1514,8 @@ static int read_input(char * filename) {
 static int tech_euler_1(double suggested_timestep, double *actual_timestep) {
     int i, j, c;
     double timestep;
-    VECTOR new_pos[MAX_NBODY];
-    VECTOR new_vel[MAX_NBODY];
+    VECTOR new_pos[g_body_number];
+    VECTOR new_vel[g_body_number];
     timestep = suggested_timestep;
     /* 
      * compute the forces between all objects
@@ -1624,14 +1624,14 @@ static int tech_euler_1(double suggested_timestep, double *actual_timestep) {
 static int tech_euler_2(double suggested_timestep, double *actual_timestep) {
     int i, j, c;
     double timestep;
-    VECTOR poor_new_pos[MAX_NBODY];
-    VECTOR better_new_pos[MAX_NBODY];
-    VECTOR poor_new_vel[MAX_NBODY];
-    VECTOR better_new_vel[MAX_NBODY];
-    VECTOR average_vel[MAX_NBODY];
-    VECTOR cur_tot_force[MAX_NBODY];
-    VECTOR poor_new_force[MAX_NBODY];
-    VECTOR average_force[MAX_NBODY];
+    VECTOR poor_new_pos[g_body_number];
+    VECTOR better_new_pos[g_body_number];
+    VECTOR poor_new_vel[g_body_number];
+    VECTOR better_new_vel[g_body_number];
+    VECTOR average_vel[g_body_number];
+    VECTOR cur_tot_force[g_body_number];
+    VECTOR poor_new_force[g_body_number];
+    VECTOR average_force[g_body_number];
 
     timestep = suggested_timestep;
 
@@ -1800,8 +1800,8 @@ static int tech_euler_2(double suggested_timestep, double *actual_timestep) {
 static int tech_euler_1a(double suggested_timestep, double *actual_timestep) {
     int i, j, c;
     double timestep;
-    VECTOR new_pos[MAX_NBODY];
-    VECTOR new_vel[MAX_NBODY];
+    VECTOR new_pos[g_body_number];
+    VECTOR new_vel[g_body_number];
 
     timestep = suggested_timestep;
 
