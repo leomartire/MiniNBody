@@ -26,8 +26,7 @@ nbody 10
 # Describes the duration of the simulation (in [T]).
 # Example :
 # duration 20
-# duration 126230400
-duration 300
+duration 126230400
 
 # Describes the integration time step (in [T]).
 # Example :
@@ -75,7 +74,7 @@ galactic no
 # - "PEC" is a PEC schema (PECE without last evaluation) with Adams-Bashforth(3+1) prediction, Adams-Moulton(3+1) correction and RK4 initialisations (order 5, slightly worse stability, faster execution (1 evaluation)).
 # Example :
 # technique RK4
-technique RK4
+technique PECE
 
 # Describes the name of file into which to write output.
 # One can use "-" to write to stdout.
