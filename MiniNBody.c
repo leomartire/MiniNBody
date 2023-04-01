@@ -1511,12 +1511,7 @@ static int read_input(char * filename) {
  *              0       if all goes well
  *              1       if an error occurs
  */
-static int
-tech_euler_1
-  (
-    double suggested_timestep, /* I: suggested timestep (sec) */
-    double * actual_timestep /* O: actual timestep used (sec) */
-  ) {
+static int tech_euler_1(double suggested_timestep, double *actual_timestep) {
     int i, j, c;
     double timestep;
     VECTOR new_pos[MAX_NBODY];
@@ -1626,12 +1621,7 @@ tech_euler_1
  *              0       if all goes well
  *              1       if an error occurs
  */
-static int
-tech_euler_2
-  (
-    double suggested_timestep, /* I: suggested timestep (sec) */
-    double * actual_timestep /* O: actual timestep used (sec) */
-  ) {
+static int tech_euler_2(double suggested_timestep, double *actual_timestep) {
     int i, j, c;
     double timestep;
     VECTOR poor_new_pos[MAX_NBODY];
@@ -1807,12 +1797,7 @@ tech_euler_2
  *              0       if all goes well
  *              1       if an error occurs
  */
-static int
-tech_euler_1a
-  (
-    double suggested_timestep, /* I: suggested timestep (sec) */
-    double * actual_timestep /* O: actual timestep used (sec) */
-  ) {
+static int tech_euler_1a(double suggested_timestep, double *actual_timestep) {
     int i, j, c;
     double timestep;
     VECTOR new_pos[MAX_NBODY];
